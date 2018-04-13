@@ -11,9 +11,9 @@ version '0.2.8'
 supports 'centos'
 supports 'ubuntu'
 
-depends 'user', '~> 0.4.2'
-depends 'user_shadow', '~> 0.1.2'
-depends 'sudo', '~> 2.7.2'
+depends 'user'
+depends 'user_shadow'
+depends 'sudo'
 
 issues_url 'https://github.com/rackspace-cookbooks/rackspace_users/issues'
 source_url 'https://github.com/rackspace-cookbooks/rackspace_users'
