@@ -1,5 +1,5 @@
 #
-# Cookbook Name:: rackspace_users
+# Cookbook Name:: system_users
 # Recipe:: default
 #
 # Copyright (C) 2015 Rackspace
@@ -12,11 +12,11 @@
 # Please read the README file for details.
 
 users = Chef::EncryptedDataBagItem.load(
-  node['rackspace_users']['data_bag'],
-  node['rackspace_users']['data_bag_item']
+  node['system_users']['data_bag'],
+  node['system_users']['data_bag_item']
 ).to_hash.reject { |user, user_data| user == 'id' }
 
-node_groups = node['rackspace_users']['node_groups']
+node_groups = node['system_users']['node_groups']
 
 groups = {}
 

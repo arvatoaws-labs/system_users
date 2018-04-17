@@ -1,14 +1,15 @@
-[![Circle CI](https://circleci.com/gh/rackspace-cookbooks/rackspace_users.svg?style=svg)](https://circleci.com/gh/rackspace-cookbooks/rackspace_users)
-
-# rackspace_users
+# system_users
 
 A cookbook to manage users from an encrypted data bag.
 
 ## Supported Platforms
 
-* Centos 6.7
+* Centos 6
+* Centos 7
 * Ubuntu 12.04
 * Ubuntu 14.04
+* Ubuntu 16.04
+* Ubuntu 18.04
 
 ## Dependencies
 
@@ -20,19 +21,19 @@ Upstream dependencies are pinned to good known versions.
 
 ## Attributes
 
-* `node['rackspace_users']['data_bag']` : Which data bag contains the item with user records. Defaults to `common`
-* `node['rackspace_users']['data_bag_item']` : The item that holds the user records. Defaults to `users`
-* `node['rackspace_users']['node_groups']` : An array of strings representing membership groups declared by the node calling the recipe. These are used to create users and grant sudo to them only on specific nodes. Defaults to `[]` (empty array).
+* `node['system_users']['data_bag']` : Which data bag contains the item with user records. Defaults to `common`
+* `node['system_users']['data_bag_item']` : The item that holds the user records. Defaults to `users`
+* `node['system_users']['node_groups']` : An array of strings representing membership groups declared by the node calling the recipe. These are used to create users and grant sudo to them only on specific nodes. Defaults to `[]` (empty array).
 
 ## Usage
 The recipe reads the users from an *encrypted* data bag item. By default, looks for a data bag named `common` and an item called `users`. This can be overwritten in the consuming cookbook.
-After you define the users in the data bag, place a dependency on the rackspace_users cookbook in your cookbook's metadata.rb:
+After you define the users in the data bag, place a dependency on the system_users cookbook in your cookbook's metadata.rb:
 ```
-depends 'rackspace_users'
+depends 'system_users'
 ```
 Then, in your recipe
 ```
-include_recipe 'rackspace_users'
+include_recipe 'system_users'
 ```
 if you have unit tests in your consuming cookbook then you will also likely need to add the `ruby-shadow` gem to your `Gemfile`, something like this:
 
@@ -166,9 +167,9 @@ User creation on nodes can be controlled by declaring a list of groups on the no
 
 
 ```
-node.default['rackspace_users']['node_groups'] = ['web', 'admin', 'test']
+node.default['system_users']['node_groups'] = ['web', 'admin', 'test']
 
-include_recipe 'rackspace_users'
+include_recipe 'system_users'
 ```
 
 
@@ -197,10 +198,10 @@ node_groups should not be defined for the user
 ```
 
 ##### User must be on all servers on environment `X`:
-On any node consuming `rackspace_users`:
+On any node consuming `system_users`:
 
 ```
-node.default['rackspace_users']['node_groups'] = [ node.chef_environment ]
+node.default['system_users']['node_groups'] = [ node.chef_environment ]
 ```
 
 On the `users` data bag item:
@@ -215,7 +216,7 @@ On the `users` data bag item:
 On the node with role `X`:
 
 ```
-node.default['rackspace_users']['node_groups'] = [ 'X' ]
+node.default['system_users']['node_groups'] = [ 'X' ]
 ```
 
 On the `users` data bag item:
@@ -230,13 +231,13 @@ On the `users` data bag item:
 On the node with role `X`:
 
 ```
-node.default['rackspace_users']['node_groups'] = [ 'X' ]
+node.default['system_users']['node_groups'] = [ 'X' ]
 ```
 
 On the node with role `Y`:
 
 ```
-node.default['rackspace_users']['node_groups'] = [ 'Y' ]
+node.default['system_users']['node_groups'] = [ 'Y' ]
 ```
 
 On the `users` data bag item:
@@ -251,7 +252,7 @@ On the `users` data bag item:
 On the node with role `X`:
 
 ```
-node.default['rackspace_users'] = [ "X_#{node.chef_environment}" ]
+node.default['system_users'] = [ "X_#{node.chef_environment}" ]
 ```
 
 On the `users` data bag item:
@@ -266,13 +267,13 @@ On the `users` data bag item:
 On the node with role `X`:
 
 ```
-node.default['rackspace_users']['node_groups'] = [ "X_#{node.chef_environment}" ]
+node.default['system_users']['node_groups'] = [ "X_#{node.chef_environment}" ]
 ```
 
 On the node with role `Y`:
 
 ```
-node.default['rackspace_users']['node_groups'] = [ "Y_#{node.chef_environment}" ]
+node.default['system_users']['node_groups'] = [ "Y_#{node.chef_environment}" ]
 ```
 
 On the `users` data bag item:
@@ -287,13 +288,13 @@ On the `users` data bag item:
 On the node with role `X`:
 
 ```
-node.default['rackspace_users']['node_groups'] = [ "X_#{node.chef_environment}" ]
+node.default['system_users']['node_groups'] = [ "X_#{node.chef_environment}" ]
 ```
 
 On the node with role `Z`:
 
 ```
-node.default['rackspace_users']['node_groups'] = [ "Z_#{node.chef_environment}" ]
+node.default['system_users']['node_groups'] = [ "Z_#{node.chef_environment}" ]
 ```
 
 On the `users` data bag item:
@@ -304,16 +305,16 @@ On the `users` data bag item:
 }
 ```
 
-Other scenarios can be potentially handled by having some logic in the recipe that creates/defines the string to be used in the `node['rackspace_users']['node_groups']` attribute. For instance if one wanted to create a user only on nodes with more than 2 CPU cores (because of some strange requirement) then they could potentially do something like this:
+Other scenarios can be potentially handled by having some logic in the recipe that creates/defines the string to be used in the `node['system_users']['node_groups']` attribute. For instance if one wanted to create a user only on nodes with more than 2 CPU cores (because of some strange requirement) then they could potentially do something like this:
 
-On any node consuming `rackspace_users`:
+On any node consuming `system_users`:
 
 ```
 if node['cpu']['total'] > 2
   membership_based_on_number_of_cores = 'cores_greater_than_2'
 end
 
-node.default['rackspace_users']['node_groups'] = [ membership_based_on_number_of_cores ]
+node.default['system_users']['node_groups'] = [ membership_based_on_number_of_cores ]
 ```
 
 On the `users` data bag item:
@@ -378,10 +379,10 @@ You can point to a different data bag and item by overwriting the corresponding 
 
 ```
 # override default data bag and item
-node.default['rackspace_users']['data_bag'] = 'my_data_bag'
-node.default['rackspace_users']['data_bag_item'] = 'my_users'
+node.default['system_users']['data_bag'] = 'my_data_bag'
+node.default['system_users']['data_bag_item'] = 'my_users'
 
-include_recipe 'rackspace_users'
+include_recipe 'system_users'
 ```
 
 ## Contributing
@@ -395,4 +396,4 @@ include_recipe 'rackspace_users'
 
 ## License and Authors
 
-Authors:: Kostas Georgakopoulos (kostas.georgakopoulos@rackspace.co.uk), Martin Smith (martin.smith@rackspace.com)
+Authors:: Kostas Georgakopoulos (kostas.georgakopoulos@rackspace.co.uk), Martin Smith (martin.smith@rackspace.com), Patrick Robinson (patrick.robinson@bertelsmann.de), Stephan Telahr (stephan.telahr@bertelsmann.de), Philipp Hellmich (philipp.hellmich@bertelsmann.de), Frederik Schubert (frederik.schubert@bertelsmann.de)

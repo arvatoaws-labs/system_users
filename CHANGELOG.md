@@ -1,4 +1,4 @@
-rackspace_users CHANGELOG
+system_users CHANGELOG
 =========================
 
 0.2.8

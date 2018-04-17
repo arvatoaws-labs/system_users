@@ -6,19 +6,40 @@ provisioner:
   name: chef_zero
   data_bags_path: 'test/fixtures/data_bags/'
   environments_path: 'test/fixtures/environments/'
-  encrypted_data_bag_secret_key_path: 'test/fixtures/cookbooks/rackspace_users_test/.encrypted_data_bag_secret'
+  encrypted_data_bag_secret_key_path: 'test/fixtures/cookbooks/system_users_test/.encrypted_data_bag_secret'
   client_rb:
     environment: 'staging'
 
 platforms:
-  - name: centos-6.7
-  - name: ubuntu-12.04
   - name: ubuntu-14.04
+    driver:
+      box: asy/trusty64-lxc
+      provider: lxc
+    run_list:
+      - recipe[apt]
+  - name: ubuntu-16.04
+    driver:
+      box: asy/xenial64-lxc
+      provider: lxc
+    run_list:
+      - recipe[apt]
+  - name: ubuntu-18.04
+    driver:
+      box: asy/bionic64-lxc
+      provider: lxc
+    run_list:
+      - recipe[apt]
+  - name: centos-7
+    driver:
+      box: asy/centos-7-64-lxc
+      provider: lxc
+    run_list:
+      - recipe[yum]
 
 suites:
   - name: default
     run_list:
-      - recipe[rackspace_users_test::default]
+      - recipe[system_users_test::default]
   - name: override
     run_list:
-      - recipe[rackspace_users_test::override]
+      - recipe[system_users_test::override]

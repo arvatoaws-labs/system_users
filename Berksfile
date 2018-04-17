@@ -1,5 +1,5 @@
 source 'https://supermarket.getchef.com'
 
-cookbook 'rackspace_users_test', path: 'test/fixtures/cookbooks/rackspace_users_test'
+cookbook 'system_users_test', path: 'test/fixtures/cookbooks/system_users_test'
 
 metadata

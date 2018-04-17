@@ -13,4 +13,4 @@ group 'newgroup' do
   gid 2000
 end
 
-include_recipe 'rackspace_users'
+include_recipe 'system_users'

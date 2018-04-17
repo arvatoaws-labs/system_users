@@ -1,6 +1,6 @@
 require 'chefspec'
 require 'chefspec/berkshelf'
-require_relative 'rackspace_users_shared'
+require_relative 'system_users_shared'
 
 ::LOG_LEVEL = ENV['CHEFSPEC_LOG_LEVEL'] ? ENV['CHEFSPEC_LOG_LEVEL'].to_sym : :fatal
 
