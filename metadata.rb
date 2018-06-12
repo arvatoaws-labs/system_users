@@ -11,7 +11,6 @@ supports 'centos'
 supports 'ubuntu'
 
 depends 'user'
-depends 'user_shadow'
 depends 'sudo'
 
 issues_url 'https://github.com/arvatoaws/system_users/issues'

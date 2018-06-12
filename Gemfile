@@ -9,6 +9,7 @@ group :unit do
   gem 'berkshelf', '~> 5.0'
   gem 'chef-sugar'
   gem 'chefspec'
+  gem 'inspec'
   gem 'ruby-shadow'
 end
 
@@ -17,6 +18,8 @@ group :kitchen_common do
 end
 
 group :kitchen_vagrant do
+  gem 'kitchen-ec2'
+  gem 'kitchen-inspec'
   gem 'kitchen-vagrant'
   gem 'vagrant-wrapper'
 end

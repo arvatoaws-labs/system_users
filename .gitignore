@@ -12,6 +12,9 @@ pkg/
 /cookbooks
 Berksfile.lock
 
+# Gemfile
+Gemfile.lock
+
 # Bundler
 bin/*
 .bundle/*
