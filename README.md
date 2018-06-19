@@ -10,11 +10,12 @@ A cookbook to manage users from an encrypted data bag.
 * Ubuntu 14.04
 * Ubuntu 16.04
 * Ubuntu 18.04
+* Windows Server 2012
+* Windows Server 2016
 
 ## Dependencies
 
 * https://supermarket.chef.io/cookbooks/user
-* https://supermarket.chef.io/cookbooks/user_shadow
 * https://supermarket.chef.io/cookbooks/sudo
 
 Upstream dependencies are pinned to good known versions.

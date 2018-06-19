@@ -40,28 +40,55 @@ users.each do |username, user_data|
       user_data['action']
     end
 
+  ruby_block 'get_user_info' do
+    block do
+      user_account = WMI::Win32_UserAccount.find(:all, conditions: { localaccount: 'TRUE', name: username })
+      if user_account && user_account.any?
+        node.override['system_users']['sid'] = user_account.first.attributes.fetch('sid')
+      else
+        node.override['system_users']['sid'] = nil
+      end
+      user_profile = WMI::Win32_UserProfile.find(:all, conditions: { sid: node['system_users']['sid'] })
+      if user_profile && user_profile.any?
+        profile_path = user_profile.first.attributes.fetch('local_path')
+        node.override['system_users']['user_password'] = nil
+      else
+        profile_path = nil
+        node.override['system_users']['user_password'] = Sysrandom.base64(45)
+      end
+      node.override['system_users']['profile_path'] = profile_path
+    end
+    action :run
+  end
+
   if user_data['action'] == 'create'
-    user_password = Sysrandom.base64(45) unless ::File.directory?("C:\\Users\\#{username}")
     user username do
-      password user_password if user_password
+      password lazy { node['system_users']['user_password'] unless node['system_users']['user_password'].nil? }
+      notifies :run, 'ruby_block[get_user_info]', :before
     end
 
     powershell_script "create_userprofile_#{username}" do
-      code <<-EOH
+      code lazy {
+        <<-EOH
         $username = "$env:COMPUTERNAME\\#{username}"
-        $spw = ConvertTo-SecureString "#{user_password}" -AsPlainText -Force
+        $spw = ConvertTo-SecureString "#{node['system_users']['user_password']}" -AsPlainText -Force
         $cred = New-Object System.Management.Automation.PsCredential ($username,$spw)
         Start-Process cmd /c -Credential $cred -LoadUserProfile -NoNewWindow -Wait
       EOH
+      }
       sensitive true
       timeout 60
-      not_if { ::File.directory?("C:\\Users\\#{username}") }
+      not_if { node['system_users']['user_password'].nil? }
     end
 
     if user_data.key?('ssh_keys')
-      directory "C:\\Users\\#{username}\\.ssh"
+      directory "#{username}_ssh" do
+        path lazy { "#{node['system_users']['profile_path']}\\.ssh" }
+        notifies :run, 'ruby_block[get_user_info]', :before
+      end
 
-      file "C:\\Users\\#{username}\\.ssh\\authorized_keys" do
+      file "#{username}_authorized_keys" do
+        path lazy { "#{node['system_users']['profile_path']}\\.ssh\\authorized_keys" }
         content user_data['ssh_keys'].first.encode('ASCII')
         sensitive true
       end
@@ -69,7 +96,7 @@ users.each do |username, user_data|
 
     user_groups = user_data['groups'] || []
     user_groups.each do |groupname|
-      if WMI::Win32_Group.find(:all, conditions: { name: groupname }).any?
+      if WMI::Win32_Group.find(:all, conditions: { domain: ENV['COMPUTERNAME'], name: groupname }).any?
         groups[groupname] = [] unless groups[groupname]
         groups[groupname] += [username]
       end
@@ -77,14 +104,14 @@ users.each do |username, user_data|
   end
 
   if user_data['action'] == 'remove'
-    user_account = WMI::Win32_UserAccount.find(:all, conditions: { localaccount: 'TRUE', name: username })
-    sid = user_account.first.attributes.fetch('sid') unless user_account.empty?
-
     powershell_script "delete_userprofile_#{username}" do
-      code <<-EOH
-        (Get-WmiObject Win32_UserProfile -Filter "SID='#{sid}'").delete()
+      code lazy {
+      <<-EOH
+        (Get-WmiObject Win32_UserProfile -Filter "SID='#{node['system_users']['sid']}'").delete()
       EOH
-      not_if { WMI::Win32_UserProfile.find(:all, conditions: { sid: sid }).empty? }
+      }
+      not_if { node['system_users']['sid'].nil? }
+      notifies :run, 'ruby_block[get_user_info]', :before
     end
 
     user username do

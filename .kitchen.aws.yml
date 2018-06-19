@@ -58,6 +58,14 @@ platforms:
       image_search:
         owner-id: "001579709704"
         name: "asy-ubuntu-1604-chef-sensu*"
+  - name: windows-2012
+    transport:
+      user: Administrator
+      name: winrm
+      elevated: true
+    driver:
+      instance_type: t2.small
+      image_id: ami-3c0f22d7
   - name: windows-2016
     transport:
       user: Administrator
@@ -65,4 +73,4 @@ platforms:
       elevated: true
     driver:
       instance_type: t2.small
-      image_id: ami-29c192c2
+      image_id: ami-68052883
