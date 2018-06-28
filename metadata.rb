@@ -5,7 +5,7 @@ license 'Apache-2.0'
 description 'A cookbook to manage users from a data bag'
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
 chef_version '>= 12'
-version '0.3.1'
+version '0.3.2'
 
 supports 'centos'
 supports 'ubuntu'
