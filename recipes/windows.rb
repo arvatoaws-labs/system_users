@@ -40,7 +40,7 @@ users.each do |username, user_data|
       user_data['action']
     end
 
-  ruby_block 'get_user_info' do
+  ruby_block "get_user_info_#{username}" do
     block do
       user_account = WMI::Win32_UserAccount.find(:all, conditions: { localaccount: 'TRUE', name: username })
       if user_account && user_account.any?
@@ -64,7 +64,7 @@ users.each do |username, user_data|
   if user_data['action'] == 'create'
     user username do
       password lazy { node['system_users']['user_password'] unless node['system_users']['user_password'].nil? }
-      notifies :run, 'ruby_block[get_user_info]', :before
+      notifies :run, "ruby_block[get_user_info_#{username}]", :before
     end
 
     powershell_script "create_userprofile_#{username}" do
@@ -84,7 +84,7 @@ users.each do |username, user_data|
     if user_data.key?('ssh_keys')
       directory "#{username}_ssh" do
         path lazy { "#{node['system_users']['profile_path']}\\.ssh" }
-        notifies :run, 'ruby_block[get_user_info]', :before
+        notifies :run, "ruby_block[get_user_info_#{username}]", :before
       end
 
       file "#{username}_authorized_keys" do
@@ -111,7 +111,7 @@ users.each do |username, user_data|
       EOH
       }
       not_if { node['system_users']['sid'].nil? }
-      notifies :run, 'ruby_block[get_user_info]', :before
+      notifies :run, "ruby_block[get_user_info_#{username}]", :before
     end
 
     user username do
