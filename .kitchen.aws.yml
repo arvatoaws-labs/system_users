@@ -1,0 +1,76 @@
+---
+driver:
+  name: ec2
+  security_group_ids: ["<%= ENV.fetch('KITCHEN_EC2_SECURITY_GROUP', 'sg-25024a4c') %>"]
+  region: <%= ENV.fetch('KITCHEN_EC2_REGION', 'eu-central-1') %>
+  availability_zone: <%= ENV.fetch('KITCHEN_EC2_AZ', 'a') %>
+  require_chef_omnibus: true
+  subnet_id: <%= ENV.fetch('KITCHEN_EC2_SUBNET', 'subnet-0ecf2f67') %>
+  iam_profile_name: <%= ENV.fetch('KITCHEN_EC2_IAM_PROFILE', 'TestKitchenRole') %>
+  instance_type: <%= ENV.fetch('KITCHEN_EC2_INSTANCE_TYPE', 't2.micro') %>
+  aws_ssh_key_id: <%= ENV.fetch('KITCHEN_EC2_SSH_KEY_ID', "#{ENV.fetch('USER', '')}aws") %>
+#  price: 0.6
+  associate_public_ip: true
+  interface: dns
+  tags:
+    Name: "kitchen_test_<%= ENV.fetch('JOB_NAME', 'unknownjob') %>_<%= ENV.fetch('BUILD_NUMBER', 'unknownbuildnumber') %>"
+    Cookbook: <%= fetchcookbookname=IO.readlines("metadata.rb")[0]; fetchcookbookname.slice! "name \'"; fetchcookbookname.slice! "\'"; fetchcookbookname %>
+    User: <%= ENV.fetch('USER', 'unknown') %>
+    Timelimit: "<%= ENV.fetch('KITCHEN_EC2_TIMELIMIT', 20*60) %>" # 20 minute max runtime
+    canTerminate: "True"
+    Kitchen_type: "Validator"
+    Kitchen_buildnumber: "<%= ENV.fetch('BUILD_NUMBER', 'unknown') %>"
+    Kitchen_buildid: "<%= ENV.fetch('BUILD_ID', 'unknown') %>"
+    Kitchen_buildtag: "<%= ENV.fetch('BUILD_TAG', 'unknown') %>"
+    Kitchen_git_branch: "<%= ENV.fetch('GIT_BRANCH', 'unknown') %>"
+    Kitchen_job_name: "<%= ENV.fetch('JOB_NAME', 'unknown') %>"
+  # root_device_size: 10
+  block_device_mappings:
+  - device_name: /dev/sda1
+    ebs:
+      volume_type: gp2
+      volume_size: 30
+      delete_on_termination: true
+
+verifier:
+  name: inspec
+  <% if ENV['CI'] == "jenkins" %>
+  format: junit
+  output: "kitchen-reports/kitchen_report_%{suite}_%{platform}_inspec.xml"
+  <% else %>
+  format: cli
+  <% end %>
+
+transport:
+  ssh_key: <%= "#{ENV['HOME']}/.ssh/#{ENV.fetch('KITCHEN_EC2_SSH_KEY_FILE', "#{ENV.fetch('USER', '')}aws")}" %>
+  connection_timeout: 10
+  connection_retries: 5
+platforms:
+  - name: ubuntu-14.04
+    transport.user: ubuntu
+    driver:
+      image_search:
+        owner-id: "001579709704"
+        name: "asy-ubuntu-1404-chef-sensu*"
+  - name: ubuntu-16.04
+    transport.user: ubuntu
+    driver:
+      image_search:
+        owner-id: "001579709704"
+        name: "asy-ubuntu-1604-chef-sensu*"
+  - name: windows-2012
+    transport:
+      user: Administrator
+      name: winrm
+      elevated: true
+    driver:
+      instance_type: t2.small
+      image_id: ami-3c0f22d7
+  - name: windows-2016
+    transport:
+      user: Administrator
+      name: winrm
+      elevated: true
+    driver:
+      instance_type: t2.small
+      image_id: ami-68052883
