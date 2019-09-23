@@ -1,4 +1,6 @@
 # system_users
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Farvatoaws%2Fsystem_users.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Farvatoaws%2Fsystem_users?ref=badge_shield)
+
 
 A cookbook to manage users from an encrypted data bag.
 
@@ -398,3 +400,6 @@ include_recipe 'system_users'
 ## License and Authors
 
 Authors:: Kostas Georgakopoulos (kostas.georgakopoulos@rackspace.co.uk), Martin Smith (martin.smith@rackspace.com), Patrick Robinson (patrick.robinson@bertelsmann.de), Stephan Telahr (stephan.telahr@bertelsmann.de), Philipp Hellmich (philipp.hellmich@bertelsmann.de), Frederik Schubert (frederik.schubert@bertelsmann.de)
+
+
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Farvatoaws%2Fsystem_users.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Farvatoaws%2Fsystem_users?ref=badge_large)
